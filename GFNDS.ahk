@@ -1,25 +1,41 @@
-﻿^j:: ;включается ctrl + j
-start()
+﻿Started := true
+Min := 30000 ;минимальный порог времени 30 сек
+Max := 60000 ;максимальный порог времени 1 мин
+
+start(Trusted)
 {
-    ;time
-    Min := 150000 ;минимальный порог времени 2 минуты 3 секунд
-    Max := 300000 ;максимальный порог времени 5 минут
+    end(false)
+    if (Trusted) {
+        ToolTip, GFNDS, 100, 100 ;открытие тултипа
+    }
+    
     Random, Time, Min, Max ;генерация времени срабатывания
     
-    ;mouse
-    MouseMin := -100 ;минимальное смещение
-    MouseMax := 100 ;максимальное смещение
-    Random, diff, MouseMin, MouseMax ;генерация смещения
-    MouseGetPos, mouseX, mouseY ;получение позиции мыши
-    mouseX -= diff ;новая позиция мыши по x
-    Random, diff, MouseMin, MouseMax ;генерация смещения
-    mouseY -= diff ;новая позиция мыши по y
-
-    ;process
     Sleep, Time ;остановка скрипта на сгенерированное время
-    MouseMove, mouseX, mouseY ;применение параметров к мыши
-    start()
+    
+    if(Started) {
+        MouseMin := -100 ;минимальное смещение
+        MouseMax := 100 ;максимальное смещение
+        Random, diff, MouseMin, MouseMax ;генерация смещения
+        MouseGetPos, mouseX, mouseY ;получение позиции мыши
+        mouseX -= diff ;новая позиция мыши по x
+        Random, diff, MouseMin, MouseMax ;генерация смещения
+        mouseY -= diff ;новая позиция мыши по y
+        
+        MouseMove, mouseX, mouseY ;применение параметров к мыши
+        start(false) ;повтор
+    }
     return
 }
+end(Trusted)
+{
+    if (Trusted) {
+        ToolTip
+        Started = false
+    }
+    return
+}
+
+^j::start(true)
+^+j::end(true)
 return
-Esc::Reload  ;выключается esc
